@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="com.obiscr.chatgpt.settings.EasyCodeState">
+    <option name="projectFiles" value="$PROJECT_DIR$/src/main/java/br/com/smartcart/api/rest/SmartCartController.java;/home/trendt000104/Projects/smartcart/smartcart/src/main/java/br/com/smartcart/application/service/impl/SmartCartServiceImpl.java;/home/trendt000104/Projects/smartcart/smartcart/src/main/java/br/com/smartcart/application/service/SmartCartService.java;/home/trendt000104/Projects/smartcart/smartcart/src/main/java/br/com/smartcart/SmartCartApplication.java" />
+  </component>
+</project>
