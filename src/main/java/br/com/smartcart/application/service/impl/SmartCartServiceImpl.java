@@ -17,7 +17,6 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static br.com.smartcart.application.util.ConvertUtil.toBigDecimal;
@@ -49,6 +48,11 @@ public class SmartCartServiceImpl implements SmartCartService {
             Document doc = Jsoup.parse(html);
 
             Store store = saveStore(doc);
+            var number = getInvoiceNumber(doc);
+            var invoices = invoiceRepository.findByNumber(number);
+            if(!CollectionUtils.isEmpty(invoices)){
+                return;
+            }
             Invoice invoice = saveInvoice(doc, store);
 
             doc.select("tr").forEach( tr -> {
@@ -66,12 +70,12 @@ public class SmartCartServiceImpl implements SmartCartService {
     }
 
     private Invoice saveInvoice(Document doc, Store store) {
-        var dtIssue = getPurchaseDateTime(doc);
         var number = getInvoiceNumber(doc);
+        var dtIssue = getPurchaseDateTime(doc);
         return invoiceRepository.save(Invoice.builder()
-                        .dtIssue(dtIssue)
-                        .storeId(store.getStoreId())
-                        .number(number)
+                .dtIssue(dtIssue)
+                .storeId(store.getStoreId())
+                .number(number)
                 .build());
     }
 
@@ -89,15 +93,23 @@ public class SmartCartServiceImpl implements SmartCartService {
 
     private void savePrice(String price, Product product, Invoice invoice) {
 
-        productPriceRepository.save(ProductPrice.builder()
-                        .price(toBigDecimal(price))
-                        .invoiceId(invoice.getInvoiceId())
-                        .productId(product.getProductId())
-                .build());
+        var productPrices = productPriceRepository.findByProductIdAndInvoiceId(product.getProductId(), invoice.getInvoiceId());
+        if(CollectionUtils.isEmpty(productPrices)){
+            productPriceRepository.save(ProductPrice.builder()
+                    .price(toBigDecimal(price))
+                    .invoiceId(invoice.getInvoiceId())
+                    .productId(product.getProductId())
+                    .build());
+        }
     }
 
     private Product saveProduct(String name) {
-        return productRepository.save(Product.builder().name(name).build());
+
+        var products = productRepository.findByName(name);
+        if(CollectionUtils.isEmpty(products)){
+            return productRepository.save(Product.builder().name(name).build());
+        }
+        return products.get(0);
     }
 
     private LocalDateTime getPurchaseDateTime(Document doc) {
