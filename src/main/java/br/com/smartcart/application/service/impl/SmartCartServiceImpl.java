@@ -1,10 +1,10 @@
 package br.com.smartcart.application.service.impl;
 
 import br.com.smartcart.application.service.SmartCartService;
-import br.com.smartcart.domain.Invoice;
-import br.com.smartcart.domain.Product;
-import br.com.smartcart.domain.ProductPrice;
-import br.com.smartcart.domain.Store;
+import br.com.smartcart.domain.entities.Invoice;
+import br.com.smartcart.domain.entities.Product;
+import br.com.smartcart.domain.entities.ProductPrice;
+import br.com.smartcart.domain.entities.Store;
 import br.com.smartcart.infraestructure.repositories.InvoiceRepository;
 import br.com.smartcart.infraestructure.repositories.ProductPriceRepository;
 import br.com.smartcart.infraestructure.repositories.ProductRepository;
@@ -50,12 +50,12 @@ public class SmartCartServiceImpl implements SmartCartService {
             Store store = saveStore(doc);
             var number = getInvoiceNumber(doc);
             var invoices = invoiceRepository.findByNumber(number);
-            if(!CollectionUtils.isEmpty(invoices)){
+            if (!CollectionUtils.isEmpty(invoices)) {
                 return;
             }
             Invoice invoice = saveInvoice(doc, store);
 
-            doc.select("tr").forEach( tr -> {
+            doc.select("tr").forEach(tr -> {
                 var name = tr.select("span.txtTit").get(0).ownText().trim();
                 var price = tr.select("span.RvlUnit").get(0).ownText().trim();
                 Product product = saveProduct(name);
@@ -71,12 +71,26 @@ public class SmartCartServiceImpl implements SmartCartService {
 
     private Invoice saveInvoice(Document doc, Store store) {
         var number = getInvoiceNumber(doc);
+        var series = getSeriesNumber(doc);
         var dtIssue = getPurchaseDateTime(doc);
         return invoiceRepository.save(Invoice.builder()
                 .dtIssue(dtIssue)
                 .storeId(store.getStoreId())
                 .number(number)
+                .series(series)
                 .build());
+    }
+
+    private String getSeriesNumber(Document doc) {
+        var text = doc.select("ul li").get(0).text();
+        var pattern = Pattern.compile("Série:\\s*(\\d+)");
+        var matcher = pattern.matcher(text);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        // todo: logar em caso de falha e pensar como proceder nessa situação
+        return "0";
     }
 
     private String getInvoiceNumber(Document doc) {
@@ -94,7 +108,7 @@ public class SmartCartServiceImpl implements SmartCartService {
     private void savePrice(String price, Product product, Invoice invoice) {
 
         var productPrices = productPriceRepository.findByProductIdAndInvoiceId(product.getProductId(), invoice.getInvoiceId());
-        if(CollectionUtils.isEmpty(productPrices)){
+        if (CollectionUtils.isEmpty(productPrices)) {
             productPriceRepository.save(ProductPrice.builder()
                     .price(toBigDecimal(price))
                     .invoiceId(invoice.getInvoiceId())
@@ -106,7 +120,7 @@ public class SmartCartServiceImpl implements SmartCartService {
     private Product saveProduct(String name) {
 
         var products = productRepository.findByName(name);
-        if(CollectionUtils.isEmpty(products)){
+        if (CollectionUtils.isEmpty(products)) {
             return productRepository.save(Product.builder().name(name).build());
         }
         return products.get(0);
@@ -116,7 +130,7 @@ public class SmartCartServiceImpl implements SmartCartService {
         var information = doc.select("ul li").get(0).ownText();
         Pattern patternDateTime = Pattern.compile("\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2}");
         var matcher = patternDateTime.matcher(information);
-        if(matcher.find()){
+        if (matcher.find()) {
             var dateTimeString = matcher.group();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             return LocalDateTime.parse(dateTimeString, formatter);
@@ -132,7 +146,7 @@ public class SmartCartServiceImpl implements SmartCartService {
         var address = div.select("div.text").get(1).ownText().trim(); // endereço
 
         var stores = storeRepository.findByName(name);
-        if(CollectionUtils.isEmpty(stores)){
+        if (CollectionUtils.isEmpty(stores)) {
             return storeRepository.save(Store.builder()
                     .name(name)
                     .cnpj(cnpj)

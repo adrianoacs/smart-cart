@@ -1,6 +1,6 @@
 package br.com.smartcart.infraestructure.repositories;
 
-import br.com.smartcart.domain.ProductPrice;
+import br.com.smartcart.domain.entities.ProductPrice;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

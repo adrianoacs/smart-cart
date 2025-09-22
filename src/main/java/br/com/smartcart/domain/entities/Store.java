@@ -1,4 +1,4 @@
-package br.com.smartcart.domain;
+package br.com.smartcart.domain.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,24 +15,30 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-
 @Entity
-@Table(name="PRODUCT")
+@Table(name="STORE")
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product {
+public class Store {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PRODUCT_ID")
-    private Long productId;
+    @Column(name = "STORE_ID")
+    private Long storeId;
 
     @Column(name = "NAME", length = 250)
     private String name;
 
+    @Column(name = "CNPJ", length = 20)
+    private String cnpj;
+
+    @Column(name = "ADDRESS", length = 400)
+    private String address;
+
     @OneToMany
-    @JoinColumn(name = "PRODUCT_ID", nullable = false, updatable = false, insertable = false)
-    private List<ProductPrice> prices;
+    @JoinColumn(name = "STORE_ID", nullable = false, updatable = false, insertable = false)
+    private List<Invoice> invoices;
+
 }

@@ -1,4 +1,4 @@
-package br.com.smartcart.domain;
+package br.com.smartcart.domain.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,32 +13,36 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name="STORE")
+@Table(name="INVOICE")
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Store {
+public class Invoice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "INVOICE_ID")
+    private Long invoiceId;
+
     @Column(name = "STORE_ID")
     private Long storeId;
 
-    @Column(name = "NAME", length = 250)
-    private String name;
+    @Column(name = "NUMBER", length = 100)
+    private String number;
 
-    @Column(name = "CNPJ", length = 20)
-    private String cnpj;
-
-    @Column(name = "ADDRESS", length = 400)
-    private String address;
+    @Column(name = "SERIES", length = 100)
+    private String series;
 
     @OneToMany
-    @JoinColumn(name = "STORE_ID", nullable = false, updatable = false, insertable = false)
-    private List<Invoice> invoices;
+    @JoinColumn(name = "INVOICE_ID", nullable = false, updatable = false, insertable = false)
+    private List<ProductPrice> prices;
+
+    @Column(name = "DT_ISSUE")
+    private LocalDateTime dtIssue;
 
 }
