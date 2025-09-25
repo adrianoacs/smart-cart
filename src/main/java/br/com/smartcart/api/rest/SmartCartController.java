@@ -4,6 +4,7 @@ import br.com.smartcart.application.service.SmartCartService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,9 +21,10 @@ public class SmartCartController {
     }
 
     @PostMapping("/import")
-    public ResponseEntity<String> importRecept(@RequestParam String url) {
+    public ResponseEntity<String> importRecept(@RequestParam String url,
+                                               @RequestHeader Long customerId) {
         try {
-            smartCartService.importRecept(url);
+            smartCartService.importRecept(url, customerId);
             return ResponseEntity.ok("Nota processada com sucesso!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

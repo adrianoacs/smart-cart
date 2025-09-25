@@ -13,38 +13,25 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name="INVOICE")
+@Table(name="CUSTOMER")
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Invoice {
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "INVOICE_ID")
-    private Long invoiceId;
-
-    @Column(name = "STORE_ID")
-    private Long storeId;
-
-    @Column(name = "NUMBER", length = 100)
-    private String number;
-
-    @Column(name = "SERIES", length = 100)
-    private String series;
-
-    @OneToMany
-    @JoinColumn(name = "INVOICE_ID", nullable = false, updatable = false, insertable = false)
-    private List<ProductPrice> prices;
-
-    @Column(name = "DT_ISSUE")
-    private LocalDateTime dtIssue;
-
     @Column(name = "CUSTOMER_ID")
     private Long customerId;
+
+    @Column(name = "NAME", length = 150)
+    private String name;
+
+    @OneToMany
+    @JoinColumn(name = "CUSTOMER_ID", nullable = false, updatable = false, insertable = false)
+    private List<ShoppingItems> shoppingItemsList;
 }

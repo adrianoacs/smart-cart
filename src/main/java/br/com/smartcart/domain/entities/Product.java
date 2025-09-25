@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -35,4 +37,11 @@ public class Product {
     @OneToMany
     @JoinColumn(name = "PRODUCT_ID", nullable = false, updatable = false, insertable = false)
     private List<ProductPrice> prices;
+
+    @ManyToMany
+    @JoinTable(name = "SHOPPING_ITEMS_PRODUCT",
+            joinColumns = @JoinColumn(name = "PRODUCT_ID"),
+            inverseJoinColumns = @JoinColumn(name = "SHOPPING_ITEMS_ID")
+    )
+    private List<ShoppingItems> shoppingItemsList;
 }

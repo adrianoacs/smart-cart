@@ -40,7 +40,7 @@ public class SmartCartServiceImpl implements SmartCartService {
     }
 
     @Override
-    public void importRecept(String url) {
+    public void importRecept(String url, Long customerId) {
 
         try {
 
