@@ -45,6 +45,6 @@ public class Invoice {
     @Column(name = "DT_ISSUE")
     private LocalDateTime dtIssue;
 
-    @Column(name = "CUSTOMER_ID")
+    @Column(name = "CUSTOMER_ID", nullable = false)
     private Long customerId;
 }

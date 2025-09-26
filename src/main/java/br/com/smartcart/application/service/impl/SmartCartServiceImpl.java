@@ -53,7 +53,7 @@ public class SmartCartServiceImpl implements SmartCartService {
             if (!CollectionUtils.isEmpty(invoices)) {
                 return;
             }
-            Invoice invoice = saveInvoice(doc, store);
+            Invoice invoice = saveInvoice(doc, store, customerId);
 
             doc.select("tr").forEach(tr -> {
                 var name = tr.select("span.txtTit").get(0).ownText().trim();
@@ -69,7 +69,7 @@ public class SmartCartServiceImpl implements SmartCartService {
 
     }
 
-    private Invoice saveInvoice(Document doc, Store store) {
+    private Invoice saveInvoice(Document doc, Store store, Long customerId) {
         var number = getInvoiceNumber(doc);
         var series = getSeriesNumber(doc);
         var dtIssue = getPurchaseDateTime(doc);
@@ -78,6 +78,7 @@ public class SmartCartServiceImpl implements SmartCartService {
                 .storeId(store.getStoreId())
                 .number(number)
                 .series(series)
+                .customerId(customerId)
                 .build());
     }
 
