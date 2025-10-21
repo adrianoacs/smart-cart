@@ -1,6 +1,6 @@
 package br.com.smartcart.api.rest;
 
-import br.com.smartcart.application.service.SmartCartService;
+import br.com.smartcart.application.service.ReceptService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,20 +11,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/receipt")
-public class SmartCartController {
+public class ReceiptController {
 
-    private final SmartCartService smartCartService;
+    private final ReceptService receptService;
 
-    public SmartCartController(SmartCartService smartCartService)
+    public ReceiptController(ReceptService receptService)
     {
-        this.smartCartService = smartCartService;
+        this.receptService = receptService;
     }
 
     @PostMapping("/import")
     public ResponseEntity<String> importRecept(@RequestParam String url,
                                                @RequestHeader Long customerId) {
         try {
-            smartCartService.importRecept(url, customerId);
+            receptService.importRecept(url, customerId);
             return ResponseEntity.ok("Nota processada com sucesso!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

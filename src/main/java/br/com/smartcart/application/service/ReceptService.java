@@ -1,5 +1,5 @@
 package br.com.smartcart.application.service;
 
-public interface SmartCartService {
+public interface ReceptService {
     void importRecept(String url, Long customerId);
 }

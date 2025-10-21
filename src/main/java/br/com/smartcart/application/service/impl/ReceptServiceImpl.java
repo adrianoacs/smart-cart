@@ -1,6 +1,6 @@
 package br.com.smartcart.application.service.impl;
 
-import br.com.smartcart.application.service.SmartCartService;
+import br.com.smartcart.application.service.ReceptService;
 import br.com.smartcart.domain.entities.Invoice;
 import br.com.smartcart.domain.entities.Product;
 import br.com.smartcart.domain.entities.ProductPrice;
@@ -8,6 +8,7 @@ import br.com.smartcart.domain.entities.Store;
 import br.com.smartcart.infraestructure.repositories.InvoiceRepository;
 import br.com.smartcart.infraestructure.repositories.ProductPriceRepository;
 import br.com.smartcart.infraestructure.repositories.ProductRepository;
+import br.com.smartcart.infraestructure.repositories.ShoppingItemsRepository;
 import br.com.smartcart.infraestructure.repositories.StoreRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,22 +23,27 @@ import java.util.regex.Pattern;
 import static br.com.smartcart.application.util.ConvertUtil.toBigDecimal;
 
 @Service
-public class SmartCartServiceImpl implements SmartCartService {
+public class ReceptServiceImpl implements ReceptService {
 
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
     private final ProductPriceRepository productPriceRepository;
     private final InvoiceRepository invoiceRepository;
+    private final ShoppingItemsRepository shoppingItemsRepository;
 
-    public SmartCartServiceImpl(ProductRepository productRepository,
-                                StoreRepository storeRepository,
-                                ProductPriceRepository productPriceRepository,
-                                InvoiceRepository invoiceRepository) {
+    public ReceptServiceImpl(ProductRepository productRepository,
+                             StoreRepository storeRepository,
+                             ProductPriceRepository productPriceRepository,
+                             InvoiceRepository invoiceRepository,
+                             ShoppingItemsRepository shoppingItemsRepository) {
         this.productRepository = productRepository;
         this.storeRepository = storeRepository;
         this.productPriceRepository = productPriceRepository;
         this.invoiceRepository = invoiceRepository;
+        this.shoppingItemsRepository = shoppingItemsRepository;
     }
+
+
 
     @Override
     public void importRecept(String url, Long customerId) {
@@ -65,8 +71,6 @@ public class SmartCartServiceImpl implements SmartCartService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
     private Invoice saveInvoice(Document doc, Store store, Long customerId) {
