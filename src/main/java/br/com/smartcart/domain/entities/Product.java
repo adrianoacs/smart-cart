@@ -38,10 +38,10 @@ public class Product {
     @JoinColumn(name = "PRODUCT_ID", nullable = false, updatable = false, insertable = false)
     private List<ProductPrice> prices;
 
-    @ManyToMany
-    @JoinTable(name = "SHOPPING_ITEMS_PRODUCT",
-            joinColumns = @JoinColumn(name = "PRODUCT_ID"),
-            inverseJoinColumns = @JoinColumn(name = "SHOPPING_ITEMS_ID")
-    )
-    private List<ShoppingItems> shoppingItemsList;
+//    @ManyToMany()
+//    @JoinTable(name = "SHOPPING_ITEMS_PRODUCT",
+//            joinColumns = @JoinColumn(name = "PRODUCT_ID"),
+//            inverseJoinColumns = @JoinColumn(name = "SHOPPING_ITEMS_ID")
+//    )
+//    private List<ShoppingItems> shoppingItems;
 }
