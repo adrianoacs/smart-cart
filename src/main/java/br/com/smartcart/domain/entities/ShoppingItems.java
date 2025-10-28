@@ -5,6 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name="SHOPPING_ITEMS")
@@ -34,10 +38,17 @@ public class ShoppingItems {
     @Column(name = "DT_ADD")
     private LocalDateTime dtAdd;
 
-//    @ManyToMany(mappedBy = "shoppingItems")
-//    private List<Product> products;
+    @ManyToMany()
+    @JoinTable(name = "SHOPPING_ITEMS_PRODUCT",
+            joinColumns = @JoinColumn(name = "SHOPPING_ITEMS_ID"),
+            inverseJoinColumns = @JoinColumn(name = "PRODUCT_ID")
+    )
+    private List<Product> products;
 
     @Column(name = "CUSTOMER_ID")
     private Long costumerId;
+
+    @Column(name = "BLOCKED")
+    private boolean blocked;
 
 }

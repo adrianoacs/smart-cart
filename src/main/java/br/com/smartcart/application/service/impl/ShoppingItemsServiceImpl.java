@@ -29,36 +29,39 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
     public void save(ShoppingItemsVO shoppingItemsVO, Long customerId) {
 
 
-//        var shoppingItems = BuilderUtil.toShoppingItems(shoppingItemsVO, customerId);
-//
-//        // list with IDs of products that already exist
-//        var existingProductIds = shoppingItemsVO.marketItemList().stream().map(ProductVO::id)
-//                .filter(Objects::nonNull)
-//                .toList();
-//        // list with new products (ids == null)
-//        var newProducts = shoppingItemsVO.marketItemList().stream().filter(item -> item.id() == null)
-//                .map(item -> Product.builder().name(item.name()).build())
-//                .toList();
-//
-//        // get managed entities on the database
-//        var existingProducts = (Collection<Product>) productRepository.findAllById(existingProductIds);
-//        // save and get new products managed
-//        var savedNewProducts = (Collection<Product>) productRepository.saveAll(newProducts);
+        var shoppingItems = BuilderUtil.toShoppingItems(shoppingItemsVO, customerId);
 
-//        if(shoppingItems.getProducts() == null)
-//        {
-//            shoppingItems.setProducts(new ArrayList<>());
-//        }
-//        // join existing products with new products into the entity 'shoppingItems' and save all
-//        shoppingItems.getProducts().addAll(savedNewProducts);
-//        shoppingItems.getProducts().addAll(existingProducts);
+        // list with IDs of products that already exist
+        var existingProductIds = shoppingItemsVO.marketItemList().stream().map(ProductVO::id)
+                .filter(Objects::nonNull)
+                .toList();
+        // list with new products (ids == null)
+        var newProducts = shoppingItemsVO.marketItemList().stream().filter(item -> item.id() == null)
+                .map(item -> Product.builder().name(item.name()).build())
+                .toList();
 
-//        shoppingItemsRepository.save(shoppingItems);
+        // get managed entities on the database
+        var existingProducts = (Collection<Product>) productRepository.findAllById(existingProductIds);
+        // save and get new products managed
+        var savedNewProducts = (Collection<Product>) productRepository.saveAll(newProducts);
+
+        if(shoppingItems.getProducts() == null)
+        {
+            shoppingItems.setProducts(new ArrayList<>());
+        }
+        // join existing products with new products into the entity 'shoppingItems' and save all
+        shoppingItems.getProducts().addAll(savedNewProducts);
+        shoppingItems.getProducts().addAll(existingProducts);
+
+        shoppingItemsRepository.save(shoppingItems);
     }
 
     @Override
     public void delete(Long shoppingItemsId) {
-        shoppingItemsRepository.deleteById(shoppingItemsId);
+        shoppingItemsRepository.findById(shoppingItemsId).ifPresent(shop -> {
+            shop.setBlocked(true);
+            shoppingItemsRepository.save(shop);
+        });
     }
 
 }
