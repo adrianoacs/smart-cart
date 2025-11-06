@@ -1,12 +1,15 @@
 package br.com.smartcart.application.service.impl;
 
+import br.com.smartcart.domain.exception.ShoppingItemNotFoundException;
+import br.com.smartcart.domain.valueobjects.response.ShoppingItemsRsVO;
 import br.com.smartcart.application.service.ShoppingItemsService;
-import br.com.smartcart.application.util.BuilderUtil;
+import br.com.smartcart.application.util.ShoppingItemBuilder;
 import br.com.smartcart.domain.entities.Product;
-import br.com.smartcart.domain.valueobjects.ProductVO;
-import br.com.smartcart.domain.valueobjects.ShoppingItemsVO;
+import br.com.smartcart.domain.valueobjects.request.ProductRqVO;
+import br.com.smartcart.domain.valueobjects.request.ShoppingItemsRqVO;
 import br.com.smartcart.infraestructure.repositories.ProductRepository;
 import br.com.smartcart.infraestructure.repositories.ShoppingItemsRepository;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,17 +29,17 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
     }
 
     @Override
-    public void save(ShoppingItemsVO shoppingItemsVO, Long customerId) {
+    public void save(ShoppingItemsRqVO shoppingItemsRqVO, Long customerId) {
 
 
-        var shoppingItems = BuilderUtil.toShoppingItems(shoppingItemsVO, customerId);
+        var shoppingItems = ShoppingItemBuilder.toShoppingItems(shoppingItemsRqVO, customerId);
 
         // list with IDs of products that already exist
-        var existingProductIds = shoppingItemsVO.marketItemList().stream().map(ProductVO::id)
+        var existingProductIds = shoppingItemsRqVO.marketItemList().stream().map(ProductRqVO::id)
                 .filter(Objects::nonNull)
                 .toList();
         // list with new products (ids == null)
-        var newProducts = shoppingItemsVO.marketItemList().stream().filter(item -> item.id() == null)
+        var newProducts = shoppingItemsRqVO.marketItemList().stream().filter(item -> item.id() == null)
                 .map(item -> Product.builder().name(item.name()).build())
                 .toList();
 
@@ -62,6 +65,13 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
             shop.setBlocked(true);
             shoppingItemsRepository.save(shop);
         });
+    }
+
+    @Override
+    public ShoppingItemsRsVO find(Long shoppingItemsId) {
+        var shoppingItems = shoppingItemsRepository.findById(shoppingItemsId)
+                .orElseThrow(() -> new ShoppingItemNotFoundException(shoppingItemsId));
+        return ShoppingItemBuilder.toShoppingItemsRsVO(shoppingItems);
     }
 
 }
