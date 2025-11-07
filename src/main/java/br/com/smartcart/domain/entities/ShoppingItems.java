@@ -1,5 +1,6 @@
 package br.com.smartcart.domain.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,14 +9,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,17 +42,20 @@ public class ShoppingItems {
     @Column(name = "DT_ADD")
     private LocalDateTime dtAdd;
 
-    @ManyToMany()
-    @JoinTable(name = "SHOPPING_ITEMS_PRODUCT",
-            joinColumns = @JoinColumn(name = "SHOPPING_ITEMS_ID"),
-            inverseJoinColumns = @JoinColumn(name = "PRODUCT_ID")
-    )
-    private List<Product> products;
+    @OneToMany(mappedBy = "shoppingItems", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ShoppingItemsProduct> shoppingItemsProducts;
 
     @Column(name = "CUSTOMER_ID")
     private Long costumerId;
 
     @Column(name = "BLOCKED")
     private boolean blocked;
+
+    public List<ShoppingItemsProduct> getShoppingItemsProducts() {
+        if(CollectionUtils.isEmpty(shoppingItemsProducts)){
+            shoppingItemsProducts = new ArrayList<>();
+        }
+        return shoppingItemsProducts;
+    }
 
 }

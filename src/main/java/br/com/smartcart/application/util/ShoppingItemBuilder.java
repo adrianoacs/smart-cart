@@ -1,11 +1,18 @@
 package br.com.smartcart.application.util;
 
+import br.com.smartcart.domain.entities.Product;
 import br.com.smartcart.domain.entities.ShoppingItems;
+import br.com.smartcart.domain.entities.ShoppingItemsProduct;
+import br.com.smartcart.domain.entities.ShoppingItemsProductId;
 import br.com.smartcart.domain.valueobjects.request.ShoppingItemsRqVO;
 import br.com.smartcart.domain.valueobjects.response.ProductRsVO;
 import br.com.smartcart.domain.valueobjects.response.ShoppingItemsRsVO;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.IntStream;
 
 
 public class ShoppingItemBuilder {
@@ -22,11 +29,28 @@ public class ShoppingItemBuilder {
 
         return ShoppingItemsRsVO.builder()
                 .name(shoppingItems.getName())
-                .products(shoppingItems.getProducts().stream()
-                        .map(product -> ProductRsVO.builder()
-                                .id(product.getProductId())
-                                .name(product.getName())
+                .products(shoppingItems.getShoppingItemsProducts().stream()
+                        .map(shoppingItemsProduct -> ProductRsVO.builder()
+                                .id(shoppingItemsProduct.getProduct().getProductId())
+                                .name(shoppingItemsProduct.getProduct().getName())
+                                .position(shoppingItemsProduct.getPosition())
                                 .build()).toList())
                 .build();
+    }
+
+    public static List<ShoppingItemsProduct> getShoppingItemsProducts(ArrayList<Product> products, ShoppingItems shoppingItems) {
+        return IntStream.range(0, products.size())
+                .mapToObj(i -> {
+                    Product product = products.get(i);
+                    return ShoppingItemsProduct.builder()
+                            .id(ShoppingItemsProductId.builder()
+                                    .shoppingItemsId(shoppingItems.getShoppingItemsId())
+                                    .productId(product.getProductId())
+                                    .build())
+                            .shoppingItems(shoppingItems)
+                            .product(product)
+                            .position(i + 1)
+                            .build();
+                }).toList();
     }
 }

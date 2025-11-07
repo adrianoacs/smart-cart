@@ -38,6 +38,4 @@ public class Product {
     @JoinColumn(name = "PRODUCT_ID", nullable = false, updatable = false, insertable = false)
     private List<ProductPrice> prices;
 
-    @ManyToMany(mappedBy = "products")
-    private List<ShoppingItems> shoppingItems;
 }

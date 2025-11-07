@@ -1,5 +1,8 @@
 package br.com.smartcart.application.service.impl;
 
+import br.com.smartcart.domain.entities.ShoppingItems;
+import br.com.smartcart.domain.entities.ShoppingItemsProduct;
+import br.com.smartcart.domain.entities.ShoppingItemsProductId;
 import br.com.smartcart.domain.exception.ShoppingItemNotFoundException;
 import br.com.smartcart.domain.valueobjects.response.ShoppingItemsRsVO;
 import br.com.smartcart.application.service.ShoppingItemsService;
@@ -8,12 +11,15 @@ import br.com.smartcart.domain.entities.Product;
 import br.com.smartcart.domain.valueobjects.request.ProductRqVO;
 import br.com.smartcart.domain.valueobjects.request.ShoppingItemsRqVO;
 import br.com.smartcart.infraestructure.repositories.ProductRepository;
+import br.com.smartcart.infraestructure.repositories.ShoppingItemsProductRepository;
 import br.com.smartcart.infraestructure.repositories.ShoppingItemsRepository;
+import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -21,11 +27,14 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
 
     private final ProductRepository productRepository;
     private final ShoppingItemsRepository shoppingItemsRepository;
+    private final ShoppingItemsProductRepository shoppingItemsProductRepository;
 
     public ShoppingItemsServiceImpl(ProductRepository productRepository,
-                                    ShoppingItemsRepository shoppingItemsRepository) {
+                                    ShoppingItemsRepository shoppingItemsRepository,
+                                    ShoppingItemsProductRepository shoppingItemsProductRepository) {
         this.productRepository = productRepository;
         this.shoppingItemsRepository = shoppingItemsRepository;
+        this.shoppingItemsProductRepository = shoppingItemsProductRepository;
     }
 
     @Override
@@ -33,6 +42,7 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
 
 
         var shoppingItems = ShoppingItemBuilder.toShoppingItems(shoppingItemsRqVO, customerId);
+        shoppingItemsRepository.save(shoppingItems);
 
         // list with IDs of products that already exist
         var existingProductIds = shoppingItemsRqVO.marketItemList().stream().map(ProductRqVO::id)
@@ -47,17 +57,16 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
         var existingProducts = (Collection<Product>) productRepository.findAllById(existingProductIds);
         // save and get new products managed
         var savedNewProducts = (Collection<Product>) productRepository.saveAll(newProducts);
+        var allProducts = new ArrayList<Product>();
+        allProducts.addAll(existingProducts);
+        allProducts.addAll(savedNewProducts);
 
-        if(shoppingItems.getProducts() == null)
-        {
-            shoppingItems.setProducts(new ArrayList<>());
-        }
-        // join existing products with new products into the entity 'shoppingItems' and save all
-        shoppingItems.getProducts().addAll(savedNewProducts);
-        shoppingItems.getProducts().addAll(existingProducts);
+        var shoppingItemsProducts = ShoppingItemBuilder.getShoppingItemsProducts(allProducts, shoppingItems);
+        shoppingItemsProductRepository.saveAll(shoppingItemsProducts);
 
-        shoppingItemsRepository.save(shoppingItems);
     }
+
+
 
     @Override
     public void delete(Long shoppingItemsId) {
