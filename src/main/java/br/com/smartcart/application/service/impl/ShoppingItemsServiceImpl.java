@@ -114,4 +114,10 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
         return ShoppingItemBuilder.toShoppingItemsRsVO(shoppingItems);
     }
 
+    @Override
+    public List<ShoppingItemsRsVO> List(Long customerId) {
+        return ShoppingItemBuilder.toShoppingItemsRsVOList(shoppingItemsRepository
+                .findAllByCostumerId(customerId));
+    }
+
 }

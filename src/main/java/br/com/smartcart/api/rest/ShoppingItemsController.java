@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/shopping-items")
 public class ShoppingItemsController {
@@ -54,6 +56,11 @@ public class ShoppingItemsController {
     @GetMapping("/{id}")
     public ResponseEntity<ShoppingItemsRsVO> find(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(shoppingItemsService.find(id));
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<ShoppingItemsRsVO>> list(@RequestHeader Long customerId) {
+        return ResponseEntity.ok(shoppingItemsService.List(customerId));
     }
 
     @PutMapping()

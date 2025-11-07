@@ -3,6 +3,8 @@ package br.com.smartcart.application.service;
 import br.com.smartcart.domain.valueobjects.request.ShoppingItemsRqVO;
 import br.com.smartcart.domain.valueobjects.response.ShoppingItemsRsVO;
 
+import java.util.List;
+
 public interface ShoppingItemsService {
 
     void save(ShoppingItemsRqVO shoppingItemsRqVO, Long customerId);
@@ -12,5 +14,7 @@ public interface ShoppingItemsService {
     void delete(Long shoppingItemsId);
 
     ShoppingItemsRsVO find(Long shoppingItemsId);
+
+    List<ShoppingItemsRsVO> List(Long customerId);
 
 }

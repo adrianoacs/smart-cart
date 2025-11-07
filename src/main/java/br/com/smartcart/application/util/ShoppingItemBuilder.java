@@ -25,9 +25,18 @@ public class ShoppingItemBuilder {
                 .build();
     }
 
+    public static List<ShoppingItemsRsVO> toShoppingItemsRsVOList(List<ShoppingItems> shoppingItems) {
+        return shoppingItems.stream().map(item ->
+                ShoppingItemsRsVO.builder()
+                        .id(item.getShoppingItemsId())
+                        .name(item.getName())
+                        .build()).toList();
+    }
+
     public static ShoppingItemsRsVO toShoppingItemsRsVO(ShoppingItems shoppingItems) {
 
         return ShoppingItemsRsVO.builder()
+                .id(shoppingItems.getShoppingItemsId())
                 .name(shoppingItems.getName())
                 .products(shoppingItems.getShoppingItemsProducts().stream()
                         .map(shoppingItemsProduct -> ProductRsVO.builder()
