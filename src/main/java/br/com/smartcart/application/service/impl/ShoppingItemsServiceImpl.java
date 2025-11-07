@@ -1,8 +1,6 @@
 package br.com.smartcart.application.service.impl;
 
-import br.com.smartcart.domain.entities.ShoppingItems;
-import br.com.smartcart.domain.entities.ShoppingItemsProduct;
-import br.com.smartcart.domain.entities.ShoppingItemsProductId;
+import br.com.smartcart.domain.exception.ProductNotFoundException;
 import br.com.smartcart.domain.exception.ShoppingItemNotFoundException;
 import br.com.smartcart.domain.valueobjects.response.ShoppingItemsRsVO;
 import br.com.smartcart.application.service.ShoppingItemsService;
@@ -13,10 +11,9 @@ import br.com.smartcart.domain.valueobjects.request.ShoppingItemsRqVO;
 import br.com.smartcart.infraestructure.repositories.ProductRepository;
 import br.com.smartcart.infraestructure.repositories.ShoppingItemsProductRepository;
 import br.com.smartcart.infraestructure.repositories.ShoppingItemsRepository;
-import org.springframework.cglib.core.CollectionUtils;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,18 +37,13 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
     @Override
     public void save(ShoppingItemsRqVO shoppingItemsRqVO, Long customerId) {
 
-
         var shoppingItems = ShoppingItemBuilder.toShoppingItems(shoppingItemsRqVO, customerId);
         shoppingItemsRepository.save(shoppingItems);
 
         // list with IDs of products that already exist
-        var existingProductIds = shoppingItemsRqVO.marketItemList().stream().map(ProductRqVO::id)
-                .filter(Objects::nonNull)
-                .toList();
+        var existingProductIds = getExistingProductIds(shoppingItemsRqVO);
         // list with new products (ids == null)
-        var newProducts = shoppingItemsRqVO.marketItemList().stream().filter(item -> item.id() == null)
-                .map(item -> Product.builder().name(item.name()).build())
-                .toList();
+        var newProducts = getNewProducts(shoppingItemsRqVO);
 
         // get managed entities on the database
         var existingProducts = (Collection<Product>) productRepository.findAllById(existingProductIds);
@@ -66,6 +58,45 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
 
     }
 
+    private static List<Long> getExistingProductIds(ShoppingItemsRqVO shoppingItemsRqVO) {
+        return shoppingItemsRqVO.marketItemList().stream().map(ProductRqVO::id)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private static List<Product> getNewProducts(ShoppingItemsRqVO shoppingItemsRqVO) {
+        return shoppingItemsRqVO.marketItemList().stream().filter(item -> item.id() == null)
+                .map(item -> Product.builder().name(item.name()).build())
+                .toList();
+    }
+
+    @Override
+    public void update(ShoppingItemsRqVO shoppingItemsRqVO, Long customerId) {
+
+        var shoppingItems = shoppingItemsRepository.findById(shoppingItemsRqVO.id())
+                .orElseThrow(() -> new ShoppingItemNotFoundException(shoppingItemsRqVO.id()));
+        shoppingItems.setName(shoppingItemsRqVO.name());
+        shoppingItems.setDtUpd(LocalDateTime.now());
+
+
+        var allProducts = new ArrayList<Product>();
+        shoppingItemsRqVO.marketItemList().forEach(item -> {
+            if (item.id() == null) {
+                allProducts.add(productRepository.save(Product.builder().name(item.name()).build()));
+            } else {
+                var product = productRepository.findById(item.id())
+                        .orElseThrow(() -> new ProductNotFoundException(item.name(), item.id()));
+                allProducts.add(product);
+            }
+        });
+
+        shoppingItemsProductRepository.deleteAll(shoppingItems.getShoppingItemsProducts());
+        shoppingItems.getShoppingItemsProducts().clear();
+
+        var shoppingItemsProducts = ShoppingItemBuilder.getShoppingItemsProducts(allProducts, shoppingItems);
+        shoppingItemsProductRepository.saveAll(shoppingItemsProducts);
+
+    }
 
 
     @Override

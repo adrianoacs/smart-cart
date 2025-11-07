@@ -42,7 +42,10 @@ public class ShoppingItems {
     @Column(name = "DT_ADD")
     private LocalDateTime dtAdd;
 
-    @OneToMany(mappedBy = "shoppingItems", orphanRemoval = true, cascade = CascadeType.ALL)
+    @Column(name = "DT_UPD")
+    private LocalDateTime dtUpd;
+
+    @OneToMany(mappedBy = "shoppingItems")
     private List<ShoppingItemsProduct> shoppingItemsProducts;
 
     @Column(name = "CUSTOMER_ID")

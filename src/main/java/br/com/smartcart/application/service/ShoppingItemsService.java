@@ -7,6 +7,8 @@ public interface ShoppingItemsService {
 
     void save(ShoppingItemsRqVO shoppingItemsRqVO, Long customerId);
 
+    void update(ShoppingItemsRqVO shoppingItemsRqVO, Long customerId);
+
     void delete(Long shoppingItemsId);
 
     ShoppingItemsRsVO find(Long shoppingItemsId);
