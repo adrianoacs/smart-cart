@@ -38,7 +38,7 @@ public class ShoppingItemBuilder {
         return ShoppingItemsRsVO.builder()
                 .id(shoppingItems.getShoppingItemsId())
                 .name(shoppingItems.getName())
-                .products(shoppingItems.getShoppingItemsProducts().stream()
+                .marketItemList(shoppingItems.getShoppingItemsProducts().stream()
                         .map(shoppingItemsProduct -> ProductRsVO.builder()
                                 .id(shoppingItemsProduct.getProduct().getProductId())
                                 .name(shoppingItemsProduct.getProduct().getName())

@@ -1,13 +1,12 @@
 package br.com.smartcart.application.service.impl;
 
+import br.com.smartcart.application.service.ShoppingItemsService;
+import br.com.smartcart.domain.entities.Product;
 import br.com.smartcart.domain.exception.ProductNotFoundException;
 import br.com.smartcart.domain.exception.ShoppingItemNotFoundException;
-import br.com.smartcart.domain.valueobjects.response.ShoppingItemsRsVO;
-import br.com.smartcart.application.service.ShoppingItemsService;
-import br.com.smartcart.application.util.ShoppingItemBuilder;
-import br.com.smartcart.domain.entities.Product;
 import br.com.smartcart.domain.valueobjects.request.ProductRqVO;
 import br.com.smartcart.domain.valueobjects.request.ShoppingItemsRqVO;
+import br.com.smartcart.domain.valueobjects.response.ShoppingItemsRsVO;
 import br.com.smartcart.infraestructure.repositories.ProductRepository;
 import br.com.smartcart.infraestructure.repositories.ShoppingItemsProductRepository;
 import br.com.smartcart.infraestructure.repositories.ShoppingItemsRepository;
@@ -18,6 +17,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+
+import static br.com.smartcart.application.util.ShoppingItemBuilder.getShoppingItemsProducts;
+import static br.com.smartcart.application.util.ShoppingItemBuilder.toShoppingItems;
+import static br.com.smartcart.application.util.ShoppingItemBuilder.toShoppingItemsRsVO;
+import static br.com.smartcart.application.util.ShoppingItemBuilder.toShoppingItemsRsVOList;
 
 @Service
 public class ShoppingItemsServiceImpl implements ShoppingItemsService {
@@ -37,23 +41,23 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
     @Override
     public void save(ShoppingItemsRqVO shoppingItemsRqVO, Long customerId) {
 
-        var shoppingItems = ShoppingItemBuilder.toShoppingItems(shoppingItemsRqVO, customerId);
+        var shoppingItems = toShoppingItems(shoppingItemsRqVO, customerId);
         shoppingItemsRepository.save(shoppingItems);
 
-        // list with IDs of products that already exist
+        // list with IDs of marketItemList that already exist
         var existingProductIds = getExistingProductIds(shoppingItemsRqVO);
-        // list with new products (ids == null)
+        // list with new marketItemList (ids == null)
         var newProducts = getNewProducts(shoppingItemsRqVO);
 
         // get managed entities on the database
         var existingProducts = (Collection<Product>) productRepository.findAllById(existingProductIds);
-        // save and get new products managed
+        // save and get new marketItemList managed
         var savedNewProducts = (Collection<Product>) productRepository.saveAll(newProducts);
         var allProducts = new ArrayList<Product>();
         allProducts.addAll(existingProducts);
         allProducts.addAll(savedNewProducts);
 
-        var shoppingItemsProducts = ShoppingItemBuilder.getShoppingItemsProducts(allProducts, shoppingItems);
+        var shoppingItemsProducts = getShoppingItemsProducts(allProducts, shoppingItems);
         shoppingItemsProductRepository.saveAll(shoppingItemsProducts);
 
     }
@@ -93,7 +97,7 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
         shoppingItemsProductRepository.deleteAll(shoppingItems.getShoppingItemsProducts());
         shoppingItems.getShoppingItemsProducts().clear();
 
-        var shoppingItemsProducts = ShoppingItemBuilder.getShoppingItemsProducts(allProducts, shoppingItems);
+        var shoppingItemsProducts = getShoppingItemsProducts(allProducts, shoppingItems);
         shoppingItemsProductRepository.saveAll(shoppingItemsProducts);
 
     }
@@ -111,12 +115,12 @@ public class ShoppingItemsServiceImpl implements ShoppingItemsService {
     public ShoppingItemsRsVO find(Long shoppingItemsId) {
         var shoppingItems = shoppingItemsRepository.findById(shoppingItemsId)
                 .orElseThrow(() -> new ShoppingItemNotFoundException(shoppingItemsId));
-        return ShoppingItemBuilder.toShoppingItemsRsVO(shoppingItems);
+        return toShoppingItemsRsVO(shoppingItems);
     }
 
     @Override
     public List<ShoppingItemsRsVO> List(Long customerId) {
-        return ShoppingItemBuilder.toShoppingItemsRsVOList(shoppingItemsRepository
+        return toShoppingItemsRsVOList(shoppingItemsRepository
                 .findAllByCostumerId(customerId));
     }
 

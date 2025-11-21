@@ -1,34 +1,29 @@
 package br.com.smartcart.api.rest;
 
-import br.com.smartcart.application.service.ReceptService;
-import org.springframework.http.HttpStatus;
+import br.com.smartcart.application.service.ProductService;
+import br.com.smartcart.domain.valueobjects.response.ProductRsVO;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/product")
 public class ProductController {
 
-    private final ReceptService receptService;
+    private final ProductService productService;
 
-    public ProductController(ReceptService receptService)
-    {
-        this.receptService = receptService;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
-    @PostMapping("/import")
-    public ResponseEntity<String> search(@RequestParam String url,
-                                               @RequestHeader Long customerId) {
-        try {
-            receptService.importRecept(url, customerId);
-            return ResponseEntity.ok("Nota processada com sucesso!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro ao processar nota: " + e.getMessage());
-        }
+    @GetMapping("/{name}")
+    public ResponseEntity<List<ProductRsVO>> search(@PathVariable String name) {
+
+        return ResponseEntity.ok(productService.search(name));
+
     }
 }

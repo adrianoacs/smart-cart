@@ -8,7 +8,6 @@ import br.com.smartcart.domain.entities.Store;
 import br.com.smartcart.infraestructure.repositories.InvoiceRepository;
 import br.com.smartcart.infraestructure.repositories.ProductPriceRepository;
 import br.com.smartcart.infraestructure.repositories.ProductRepository;
-import br.com.smartcart.infraestructure.repositories.ShoppingItemsRepository;
 import br.com.smartcart.infraestructure.repositories.StoreRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,18 +28,15 @@ public class ReceptServiceImpl implements ReceptService {
     private final StoreRepository storeRepository;
     private final ProductPriceRepository productPriceRepository;
     private final InvoiceRepository invoiceRepository;
-    private final ShoppingItemsRepository shoppingItemsRepository;
 
     public ReceptServiceImpl(ProductRepository productRepository,
                              StoreRepository storeRepository,
                              ProductPriceRepository productPriceRepository,
-                             InvoiceRepository invoiceRepository,
-                             ShoppingItemsRepository shoppingItemsRepository) {
+                             InvoiceRepository invoiceRepository) {
         this.productRepository = productRepository;
         this.storeRepository = storeRepository;
         this.productPriceRepository = productPriceRepository;
         this.invoiceRepository = invoiceRepository;
-        this.shoppingItemsRepository = shoppingItemsRepository;
     }
 
 
