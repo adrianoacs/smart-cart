@@ -31,6 +31,12 @@ public class Customer {
     @Column(name = "NAME", length = 150)
     private String name;
 
+    @Column(name = "EXTERNAL_ID", length = 150)
+    private String externalId;
+
+    @Column(name = "EMAIL", length = 200)
+    private String email;
+
     @OneToMany
     @JoinColumn(name = "CUSTOMER_ID", nullable = false, updatable = false, insertable = false)
     private List<ShoppingItems> shoppingItemsList;

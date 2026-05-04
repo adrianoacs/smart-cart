@@ -34,3 +34,20 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/smartcart
+
+# If your Keycloak is configured to use audience (client) checks, you can configure the accepted audience
+# and optionally add a JwtAuthenticationConverter to map roles. Example below is commented out and optional.
+#
+#spring:
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: https://keycloak.example.com/auth/realms/myrealm
+#        jwk-set-uri: https://keycloak.example.com/auth/realms/myrealm/protocol/openid-connect/certs
